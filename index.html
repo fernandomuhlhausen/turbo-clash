@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <meta name="description" content="TURBO CLASH - futebol arcade com carros: turbo, saltos e conducao pelas paredes em arena 3D." />
+    <title>TURBO CLASH - Futebol Arcade com Carros</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b1220'/%3E%3Ccircle cx='16' cy='16' r='8' fill='none' stroke='%237fd4ff' stroke-width='2.5'/%3E%3Cpath d='M10 16h12M16 10v12' stroke='%23ff7a26' stroke-width='2.5'/%3E%3C/svg%3E" />
+    <script type="module" crossorigin src="./assets/index-ucZpCmVS.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-CNIudziF.css">
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="game-canvas"></canvas>
+
+      <!-- HUD da partida -->
+      <div id="hud" class="hidden" aria-hidden="true">
+        <div id="hud-top">
+          <div id="hud-scoreboard">
+            <div class="team team-blue">
+              <span class="team-name">AZUL</span>
+              <span class="team-score" id="hud-score-blue">0</span>
+            </div>
+            <div id="hud-timer-wrap">
+              <span id="hud-timer">2:00</span>
+              <span id="hud-status">PREPARE-SE</span>
+            </div>
+            <div class="team team-orange">
+              <span class="team-score" id="hud-score-orange">0</span>
+              <span class="team-name">LARANJA</span>
+            </div>
+          </div>
+          <button id="btn-pause" class="icon-button" type="button" title="Pausar (Esc)">II</button>
+        </div>
+        <div id="hud-bottom">
+          <div id="hud-boost">
+            <div id="hud-boost-label">TURBO</div>
+            <div id="hud-boost-bar"><div id="hud-boost-fill"></div></div>
+          </div>
+          <div id="hud-hint">W A S D ou setas &middot; ESPACO salta &middot; SHIFT turbo &middot; R reposiciona &middot; C camera &middot; ESC pausa</div>
+        </div>
+        <div id="goal-banner" class="hidden">
+          <div id="goal-banner-text">GOL!</div>
+          <div id="goal-banner-sub">AZUL MARCOU</div>
+        </div>
+      </div>
+
+      <!-- Menu inicial -->
+      <div id="screen-menu" class="screen">
+        <div class="menu-panel">
+          <h1 class="game-title">TURBO<span class="title-accent">CLASH</span></h1>
+          <p class="game-subtitle">Futebol arcade com carros &mdash; turbo, saltos e conducao pelas paredes</p>
+          <div class="difficulty-row" role="group" aria-label="Dificuldade">
+            <span class="difficulty-label">DIFICULDADE</span>
+            <div class="difficulty-options">
+              <button class="difficulty-button" type="button" data-difficulty="facil">FACIL</button>
+              <button class="difficulty-button selected" type="button" data-difficulty="normal">NORMAL</button>
+              <button class="difficulty-button" type="button" data-difficulty="dificil">DIFICIL</button>
+            </div>
+          </div>
+          <div class="difficulty-row" role="group" aria-label="Jogadores">
+            <span class="difficulty-label">JOGADORES POR TIME</span>
+            <div class="difficulty-options">
+              <button class="size-button" type="button" data-size="1">1x1</button>
+              <button class="size-button selected" type="button" data-size="2">2x2</button>
+              <button class="size-button" type="button" data-size="3">3x3</button>
+              <button class="size-button" type="button" data-size="4">4x4</button>
+              <button class="size-button" type="button" data-size="5">5x5</button>
+            </div>
+          </div>
+          <button id="btn-play" class="primary-button" type="button">JOGAR</button>
+          <div class="menu-row">
+            <button id="btn-help" class="secondary-button" type="button">CONTROLES</button>
+            <button id="btn-sound" class="secondary-button" type="button">SOM: LIGADO</button>
+          </div>
+          <p class="menu-foot">Partida de 2 minutos &middot; até 5 x 5 &middot; arenas fechadas</p>
+        </div>
+      </div>
+
+      <!-- Ajuda / controles -->
+      <div id="screen-help" class="screen hidden">
+        <div class="menu-panel">
+          <h2 class="panel-title">CONTROLES</h2>
+          <table class="controls-table">
+            <tr><td><kbd>W</kbd> / <kbd>&uarr;</kbd></td><td>Acelerar</td></tr>
+            <tr><td><kbd>S</kbd> / <kbd>&darr;</kbd></td><td>Frear e dar ré</td></tr>
+            <tr><td><kbd>A</kbd> <kbd>D</kbd> / <kbd>&larr;</kbd> <kbd>&rarr;</kbd></td><td>Dirigir</td></tr>
+            <tr><td><kbd>ESPACO</kbd></td><td>Saltar (no ar: controle limitado)</td></tr>
+            <tr><td><kbd>SHIFT</kbd></td><td>Turbo (reserva limitada, recarrega sozinha)</td></tr>
+            <tr><td><kbd>R</kbd></td><td>Reposicionar o carro se travar</td></tr>
+            <tr><td><kbd>C</kbd></td><td>Alternar camera (piloto / geral)</td></tr>
+            <tr><td><kbd>ESC</kbd> / <kbd>P</kbd></td><td>Pausar</td></tr>
+          </table>
+          <p class="help-tip">Bata na bola com velocidade para chutar. Suba pelas paredes inclinando o carro nas curvas da arena.</p>
+          <button id="btn-help-back" class="primary-button" type="button">VOLTAR</button>
+        </div>
+      </div>
+
+      <!-- Pausa -->
+      <div id="screen-pause" class="screen hidden">
+        <div class="menu-panel">
+          <h2 class="panel-title">PAUSADO</h2>
+          <p id="pause-score" class="pause-score">0 x 0</p>
+          <button id="btn-resume" class="primary-button" type="button">CONTINUAR</button>
+          <button id="btn-restart" class="secondary-button" type="button">REINICIAR PARTIDA</button>
+          <button id="btn-quit" class="secondary-button" type="button">VOLTAR AO MENU</button>
+        </div>
+      </div>
+
+      <!-- Resultado -->
+      <div id="screen-result" class="screen hidden">
+        <div class="menu-panel">
+          <h2 id="result-title" class="panel-title">VITORIA</h2>
+          <p id="result-score" class="result-score">3 x 2</p>
+          <div id="result-stats" class="result-stats"></div>
+          <button id="btn-again" class="primary-button" type="button">JOGAR NOVAMENTE</button>
+          <button id="btn-menu" class="secondary-button" type="button">VOLTAR AO MENU</button>
+        </div>
+      </div>
+
+      <!-- Aviso de carregamento -->
+      <div id="screen-loading" class="screen">
+        <div class="menu-panel">
+          <h2 class="panel-title">PREPARANDO A ARENA...</h2>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
